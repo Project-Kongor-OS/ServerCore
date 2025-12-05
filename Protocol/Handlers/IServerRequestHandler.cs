@@ -1,4 +1,4 @@
-namespace ZORGATH;
+namespace ProjectKongor.Protocol.Handlers;
 
 /// <summary>
 ///    Interface for a `server_requester.php` function request handlers.
