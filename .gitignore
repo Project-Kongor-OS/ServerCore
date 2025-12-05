@@ -1,0 +1,5 @@
+# Ignore local editor data
+.idea
+.vs
+bin
+obj
