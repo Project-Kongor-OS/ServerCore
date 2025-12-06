@@ -1,2 +1,1 @@
-# ServerCore
-A shared core for server logic and protocols
+# ServerCore: Shared KONGOR Server Protocols/Logic &ensp; [![GitHub Workflow Status](https://github.com/Project-Kongor-OS/ServerCore/actions/workflows/dotnet.yaml/badge.svg?branch=main)](https://github.com/Project-Kongor-OS/ServerCore/actions/workflows/dotnet.yaml)
