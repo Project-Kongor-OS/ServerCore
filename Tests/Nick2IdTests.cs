@@ -1,5 +1,6 @@
 ﻿
 using KONGOR.Shared.Handlers.Client;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ServerCoreTest;
 
@@ -58,6 +59,7 @@ public class Nick2IdHandlerTests
 
 		// Optionally, deserialize the output to check contents
 		var deserialized = PhpSerialization.Deserialize<Dictionary<string, object>>(serializedOutput);
+		Assert.NotNull(deserialized);
 		Assert.Equal(123, (int)deserialized["user1"]);
 		Assert.Equal(456, (int)deserialized["user2"]);
 		Assert.Equal(5, (int)deserialized["vested_threshold"]);
