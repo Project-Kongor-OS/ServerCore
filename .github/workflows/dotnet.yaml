@@ -1,4 +1,4 @@
-name: BUILD TEST
+name: BUILDTEST
 
 on:
   push:
