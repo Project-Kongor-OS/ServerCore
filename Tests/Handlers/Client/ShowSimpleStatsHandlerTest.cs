@@ -2,14 +2,48 @@
 
 public class ShowSimpleStatsHandlerTests
 {
-	private ShowSimpleStatsHandler CreateHandler(out Mock<IPlayerStatsService> serviceMock, ShowSimpleStatsData? returnData = null)
+	private ShowSimpleStatsHandler CreateHandler(
+			out Mock<IStatsService> statsMock,
+			out Mock<IAuthService> authMock,
+			ShowSimpleStatsData? returnData = null,
+			bool cookieValid = true)
 	{
-		serviceMock = new Mock<IPlayerStatsService>();
-		serviceMock
-			.Setup(s => s.GetShowSimpleStatsAsync(It.IsAny<string>(), It.IsAny<string>()))
+		// Stats service mock
+		statsMock = new Mock<IStatsService>();
+		statsMock
+			.Setup(s => s.GetShowSimpleStatsAsync(It.IsAny<string>()))
 			.ReturnsAsync(returnData);
 
-		return new ShowSimpleStatsHandler(serviceMock.Object);
+		// Auth service mock
+		authMock = new Mock<IAuthService>();
+		authMock
+			.Setup(a => a.IsValidCookieAsync(It.IsAny<string>()))
+			.ReturnsAsync(cookieValid);
+
+		return new ShowSimpleStatsHandler(statsMock.Object, authMock.Object);
+	}
+
+	[Fact]
+	public async Task HandleRequest_ReturnsUnauthorized_WhenCookieIsInvalid()
+	{
+		// Arrange
+		var handler = CreateHandler(out var statsMock, out var authMock,
+			returnData: null,
+			cookieValid: false);
+
+		var formData = new Dictionary<string, string>
+		{
+			["cookie"] = "bad_cookie",
+			["nickname"] = "player1"
+		};
+
+		// Act
+		var result = await handler.HandleRequest(formData);
+
+		// Assert
+		Assert.IsType<UnauthorizedResult>(result);
+		authMock.Verify(a => a.IsValidCookieAsync("bad_cookie"), Times.Once);
+		statsMock.Verify(s => s.GetShowSimpleStatsAsync(It.IsAny<string>()), Times.Never);
 	}
 
 	[Fact]
@@ -34,7 +68,7 @@ public class ShowSimpleStatsHandlerTests
 			SeasonCasual: new SeasonShortSummary(3, 1, 0, 0)
 		);
 
-		var handler = CreateHandler(out var mockService, dto);
+		var handler = CreateHandler(out var statsMock, out var authMock, returnData: dto, cookieValid: true);
 
 		var formData = new Dictionary<string, string>
 		{
@@ -53,13 +87,14 @@ public class ShowSimpleStatsHandlerTests
 		var expected =
 			@"a:14:{s:8:""nickname"";s:7:""player1"";s:5:""level"";i:10;s:9:""level_exp"";i:5000;s:8:""hero_num"";i:139;s:10:""avatar_num"";i:2;s:12:""total_played"";i:100;s:7:""mvp_num"";i:3;s:17:""selected_upgrades"";a:2:{i:0;s:8:""upgrade1"";i:1;s:8:""upgrade2"";}s:10:""account_id"";i:42;s:9:""season_id"";i:22;s:13:""season_normal"";a:4:{s:4:""wins"";i:10;s:6:""losses"";i:5;s:10:""win_streak"";i:2;s:13:""current_level"";i:1;}s:13:""season_casual"";a:4:{s:4:""wins"";i:3;s:6:""losses"";i:1;s:10:""win_streak"";i:0;s:13:""current_level"";i:0;}s:15:""award_top4_name"";a:4:{i:0;s:1:""a"";i:1;s:1:""b"";i:2;s:1:""c"";i:3;s:1:""d"";}s:14:""award_top4_num"";a:4:{i:0;i:5;i:1;i:4;i:2;i:3;i:3;i:2;}}";
 		Assert.Equal(expected, serialized);
+		statsMock.Verify(s => s.GetShowSimpleStatsAsync("player1"), Times.Once);
 	}
 
 	[Fact]
 	public async Task HandleRequest_ReturnsNotFound_WhenDataIsNull()
 	{
 		// Arrange
-		var handler = CreateHandler(out var mockService, returnData: null);
+		var handler = CreateHandler(out var statsMock, out var authMock, returnData: null, cookieValid: true);
 
 		var formData = new Dictionary<string, string>
 		{
@@ -72,5 +107,6 @@ public class ShowSimpleStatsHandlerTests
 
 		// Assert
 		Assert.IsType<NotFoundResult>(result);
+		statsMock.Verify(s => s.GetShowSimpleStatsAsync("player1"), Times.Once);
 	}
 }

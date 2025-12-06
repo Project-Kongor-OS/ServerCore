@@ -21,7 +21,7 @@ global using PhpSerializerNET;
 global using ProjectKongor.Protocol.DTOs;
 global using ProjectKongor.Protocol.Enums;
 global using ProjectKongor.Protocol.HTTP.Responses;
-global using ProjectKongor.Protocol.Handlers;
+global using ProjectKongor.Protocol.Handlers.Client;
 global using ProjectKongor.Protocol.Registries;
 global using ProjectKongor.Protocol.Services;
 #endregion
