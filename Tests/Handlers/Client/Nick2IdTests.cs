@@ -1,8 +1,4 @@
-﻿
-using KONGOR.Shared.Handlers.Client;
-using Microsoft.AspNetCore.Mvc;
-
-namespace ServerCoreTest;
+﻿namespace ProjectKongor.Tests.Handlers.Client;
 
 public class Nick2IdHandlerTests
 {
